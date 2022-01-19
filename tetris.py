@@ -10,9 +10,9 @@ def descente_barre(piece):
     puis retourne de combien elle doit descendre"""
     if piece == barre:
         result = 1
-    elif piece == barre_s | piece == barre_t | piece == barre_z:
+    elif piece == barre_s or piece == barre_z:
         result = 2
-    elif piece == carre:
+    elif piece == carre or piece == barre_t:
         result = 3
     return result
 
@@ -51,7 +51,25 @@ barre_t = Image("09000:"
 barres = [barre_s, barre_z, barre, barre_t, carre]
 barre_selectionnee = selectionner_barre(barres)
 descente = descente_barre(barre_selectionnee)
+barres_posees = []
 
 for i in range(0, descente):
-    display.show(barre_selectionnee.shift_down(i))
+    display.show(barre_selectionnee.shift_down(i+1))
     sleep(200)
+
+barres_posees.append(barre_selectionnee.shift_down(descente))
+print(barres_posees)
+
+clic_bouton_a = 0
+clic_bouton_b = 0
+
+while True:
+    if button_b.was_pressed():
+        clic_bouton_a += 1
+        display.show(barres_posees[-1].shift_right(clic_bouton_a))
+        print(clic_bouton_a)
+
+    if button_a.was_pressed():
+        clic_bouton_a -= 1
+        display.show(barres_posees[-1].shift_right(clic_bouton_a))
+        print(clic_bouton_a)
