@@ -55,7 +55,7 @@ barres_posees = []
 
 for i in range(0, descente):
     display.show(barre_selectionnee.shift_down(i+1))
-    sleep(200)
+    sleep(300)
 
 barres_posees.append(barre_selectionnee.shift_down(descente))
 print(barres_posees)
