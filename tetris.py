@@ -11,7 +11,7 @@ class barre:
     """Une barre qui a sa position x et y"""
 
     # Définition des différentes barres
-    barre_s = Image("99000:" "00000:" "00000:" "00000:" "00000")
+    barre_s = Image("00000:" "99000:" "00000:" "00000:" "00000")
     barre_z = Image("09000:" "99000:" "00000:" "00000:" "00000")
     barre = Image("90000:" "99000:" "00000:" "00000:" "00000")
     carre = Image("99000:" "99000:" "00000:" "00000:" "00000")
@@ -23,40 +23,65 @@ class barre:
         self.y = 0
         self.forme_barre = selectionner_barre(barre.barres)
 
+    def stockerTab(self, ImagePieces=None):
+        self.ImagePieces = ImagePieces
+
+    def taille(self):
+        if self.forme_barre == barre.barre_s:
+            return 0
+        elif self.forme_barre == barre.barre_t:
+            return 3
+        else:
+            return 2
+
     def peutDescendre(self):
-        """va chercher la hauteur de la barre,
-        puis retourne de combien elle doit descendre"""
-        if display.get_pixel(2, self.y) == 0 and self.x < 3:
-            self.x += 1
-            self.afficherBarre(self.x, self.y)
+        """Si le pixel situé à la position X/Y est éteint,
+        le descendre de tant de pixel (ici self.taille qui définit
+        la descente."""
+        try:
+            if display.get_pixel(self.x, self.y+self.taille()) == 0:
+                print(display.get_pixel(self.x, self.y+self.taille()))
+                self.y += 1
+                self.forme_barre = self.forme_barre.shift_down(1)
+                return True
+        except ValueError:
+            pass
+
+    def peutBouger(self):
+        if self.x >= 0 and self.x <= 5:
             return True
 
     def allerADroite(self):
-        self.y += 1
-        print(self.y)
-        self.afficherBarre(self.x, self.y)
+        self.forme_barre = self.forme_barre.shift_right(1)
 
     def allerAGauche(self):
-        self.y -= 1
-        print(self.y)
-        self.afficherBarre(self.x, self.y)
-
-    def afficherBarre(self, pos_x=0, pos_y=0):
-        display.show(self.forme_barre.shift_down(pos_x).shift_right(pos_y))
+        self.forme_barre = self.forme_barre.shift_left(1)
 
 
-barre_courante = barre()
+def additionnerBarres(tab_bars):
+    result = Image("00000:" "00000:" "00000:" "00000:" "00000")
+    for barre_dans_tab in barres_posees:
+        result = result + barre_dans_tab
+    print("Ajouter barre : {}".format(result))
+    return result
+
+def afficherBarre(barre, tab_bars):
+    print(barre.forme_barre)
+    display.show(barre.forme_barre + additionnerBarres(tab_bars))
+
 barres_posees = []
 
-barres_posees.append(barre_courante)
-barre_courante.afficherBarre()
+for i in range(5):
+    barre_courante = barre()
+    while barre_courante.peutDescendre():
+        if button_a.was_pressed():
+            barre_courante.allerAGauche()
+            afficherBarre(barre_courante, barres_posees)
+        if button_b.was_pressed():
+            barre_courante.allerADroite()
+            afficherBarre(barre_courante, barres_posees)
+        afficherBarre(barre_courante, barres_posees)
+        sleep(300)
 
-while barre_courante.peutDescendre():
-
-    if button_b.was_pressed():
-        barre_courante.allerADroite()
-
-    if button_a.was_pressed():
-        barre_courante.allerAGauche()
-
-    sleep(300)
+    barres_posees.append(barre_courante.forme_barre)
+    display.show(additionnerBarres(barres_posees))
